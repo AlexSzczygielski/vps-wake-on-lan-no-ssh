@@ -4,6 +4,10 @@ Turn on remote machine, using VPS and simple local server (e.g. RaspberryPi). Th
 
 > Bash files are prepared for RPi 4B, so other machines might need a little adjustments.
 
+### `Local, VPS` are the words determining which side of the project given file/script is responsible for
+
+---
+
 ## Local Server (RaspberryPi)
 
 ### Usage
@@ -25,3 +29,21 @@ To reload dashboard web page (in order to see some changes) use:
 ```bash
 sudo systemctl restart local-dashboard
 ```
+
+Local server is responsible for monitoring VPS for request to turn on the comptuer. VPS updates one of it's files when user requests it. Local server fetches this file using `curl`, waiting for a specific command in this file. When curl command returns required phrase, the magic packet is sent and computer is powered on.
+
+Additionally local server utilizes a simple dashboard with a button that allows to send magic packet, when we are logged to the home network. This simplifies the process that beforehand required using a terminal and remembering a MAC address.
+---
+
+## VPS (MIKRUS, 5 PLN TIER)
+1. Setup MIKR.US
+
+2. `git clone` this repository
+
+3.  
+```bash
+chmod +x vps-configuration.sh
+sudo ./vps-configuration.sh
+```
+
+VPS is based on flask for a webpage and gunicore to activate it as a daemon.
