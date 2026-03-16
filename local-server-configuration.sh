@@ -1,4 +1,5 @@
 #!/bin/bash
+#local-server-configuration.sh
 # This script is responsible for preparing the local server (RPi) after fresh install
 
 mac_address=""
@@ -28,8 +29,8 @@ while true; do
         # Optionally: validate MAC format (basic check)
         if [[ "$mac_address" =~ ^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$ ]]; then
             echo "MAC address accepted: $mac_address"
-            echo "MAC_ADDRESS=$mac_address" > ~/.wol_env
-            echo "Saved MAC address to ~/.wol_env"
+            echo "MAC_ADDRESS=$mac_address" > .wol_env
+            echo "Saved MAC address to .wol_env"
             break
         else
             echo "Invalid MAC address format! Please use XX:XX:XX:XX:XX:XX"
