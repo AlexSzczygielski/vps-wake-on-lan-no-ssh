@@ -1,0 +1,1 @@
+# VPS-WAKE-ON-LAN-NO-SSH
