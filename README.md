@@ -5,6 +5,8 @@ Turn on remote machine, using VPS and simple local server (e.g. RaspberryPi). Th
 > Bash files are prepared for RPi 4B, so other machines might need a little adjustments.
 
 ## Local Server (RaspberryPi)
+
+### Usage
 1. Install fresh OS
 
 > For RPi I recommend PiOS Lite 64bit - it's easy to set up and to use in headless mode, via ssh.
@@ -16,3 +18,10 @@ chmod +x local-server-configuration.sh
 ```
 
 3. Follow the instructions. Prepare MAC address of the device you want to wake up beforehand.
+
+---
+To reload dashboard web page (in order to see some changes) use:
+
+```bash
+sudo systemctl restart local-dashboard
+```

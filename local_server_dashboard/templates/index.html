@@ -1,19 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WoL Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Wake-on-LAN Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <!-- <meta http-equiv="refresh" content="5"> -->
+
+    <!-- Link external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Wake-on-LAN Dashboard</h1>
+    <div class="header">
+        <h1>Wake-on-LAN Dashboard</h1>
+        <div id="clock">--:--:--</div>
+    </div>
 
-<form action="/wake" method="post">
-    <button type="submit">Send Magic Packet</button>
-</form>
+    <form action="/wake" method="post">
+        <button type="submit">Send Magic Packet</button>
+    </form>
 
-<h2>Log</h2>
-<pre>{{ logs }}</pre>
+    <h2>Log</h2>
+    <pre>{{ logs }}</pre>
+
+    <script>
+        // Live clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById("clock").textContent = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // initial call
+    </script>
 
 </body>
 </html>
