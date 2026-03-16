@@ -1,0 +1,13 @@
+[Unit]
+Description=Wake-on-LAN Dashboard
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory={{WORKDIR}}
+ExecStart=/usr/bin/python3 index.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

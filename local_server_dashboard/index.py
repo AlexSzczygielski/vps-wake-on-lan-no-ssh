@@ -49,7 +49,7 @@ def wake():
     except Exception as e:
         print(f"Magic packet failed: {e}")
     
-    return redirect(url_for("index"))
+    return redirect(url_for("index")) # reload page
 
 
 if __name__ == "__main__":

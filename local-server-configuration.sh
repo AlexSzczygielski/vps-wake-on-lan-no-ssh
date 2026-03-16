@@ -49,10 +49,27 @@ while true; do
         sudo apt install python3-pip -y
         sudo apt install python3-flask -y
 
-        echo "Starting Flask dashboard in the background..."
-        cd local_server_dashboard || exit
-        nohup python3 index.py &
-        echo "Flask dashboard running at http://<raspberry_pi_ip>:5000/"
+        # systemd service setup
+        SERVICE_TEMPLATE="local_server_dashboard/local-dashboard.service.template"
+        SERVICE_FILE="/etc/systemd/system/local-dashboard.service"
+
+        # Detect current user and working directory
+        CURRENT_USER="$USER"
+        WORKDIR="$(pwd)/local_server_dashboard"
+
+        echo "Setting up systemd service..."
+
+        # Replace placeholders and copy to systemd directory
+        sudo sed "s|{{USER}}|$CURRENT_USER|g; s|{{WORKDIR}}|$WORKDIR|g" "$SERVICE_TEMPLATE" | sudo tee "$SERVICE_FILE" > /dev/null
+
+        # Reload systemd and enable service
+        sudo systemctl unmask local-dashboard.service 2>/dev/null
+        sudo systemctl daemon-reload
+        sudo systemctl enable local-dashboard
+        sudo systemctl start local-dashboard
+
+        echo "Flask dashboard will now autostart on boot (port 80)"
+        
         break
     elif [[ "$response" == "no" || "$response" == "n" ]]; then
         echo "Skipping server dashboard"
