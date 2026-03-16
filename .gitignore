@@ -1,1 +1,2 @@
-.out
+*.out
+wol_log.txt
