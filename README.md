@@ -25,10 +25,11 @@ Request Accepted
 
 > For RPi I recommend PiOS Lite 64bit - it's easy to set up and to use in headless mode, via ssh.
 
-2. Make `local-server-configuration.sh` executable:
+2. Make `local-server-configuration.sh` executable and run it:
 
 ```bash
 chmod +x local-server-configuration.sh
+./local-server-configuration.sh
 ```
 
 3. Follow the instructions. Prepare MAC address of the device you want to wake up beforehand.
@@ -46,17 +47,21 @@ Additionally local server utilizes a simple dashboard ([index.py](local_server_d
 ---
 
 ## VPS (MIKRUS, 5 PLN TIER)
-1. Setup MIKR.US
+### Usage
+1. Setup [Mikrus FROG VPS](https://frog.mikr.us/)
 
-2. `git clone` this repository
+2. Log into your VPS and `git clone` this repository
 
-3.  
+3. Run automatic configuration **for vps** bash file:
+
 ```bash
 chmod +x vps-configuration.sh
 sudo ./vps-configuration.sh
 ```
 
 VPS is based on flask for a webpage and gunicore to activate it as a daemon. To remotely start your PC you should use `curl "http://frog02.mikr.us:YOUR_PORT/wol_request?token=YOUR_TOKEN"`. This shouuld return `Request Accepted`. If request was accpeted then `wol_command_endpoint` returns `WOL_START` (this is polled by your server on local network - RPi).
+
+> Remeber to log into your Mikrus VPS every 3 months, as it is shut off for users that don't do that.
 
 ### TODO:
 - add separate tokens for RPi and Caller (User)
