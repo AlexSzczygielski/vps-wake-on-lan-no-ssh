@@ -79,6 +79,13 @@ while true; do
     fi
 done
 
+echo "Generating your user and local-server authentication tokens (NOT READY)"
+echo "User token:"
+echo openssl rand -hex 16
+echo "local-server token:"
+echo openssl rand -hex 16
 
+echo "Starting local-command-polling"
+nohup python3 ~/vps-wake-on-lan-no-ssh/wol_agent.py &
 
 echo "Installation completed"

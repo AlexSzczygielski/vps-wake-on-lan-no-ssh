@@ -8,6 +8,16 @@ Turn on remote machine, using VPS and simple local server (e.g. RaspberryPi). Th
 
 ---
 
+### How does this work?
+1. Sent request to VPS, authorized by token you set up. 
+```bash
+curl "http://frog02.mikr.us:YOUR_PORT/wol_request?token=YOUR_TOKEN"
+Request Accepted
+```
+2. Server on your local network polls the VPS endpoint. When endpoint returns the command, the magic packet is sent.
+
+3. Dashboard on local server provides full log of sent WOL packets.
+
 ## Local Server (RaspberryPi)
 
 ### Usage
@@ -30,9 +40,9 @@ To reload dashboard web page (in order to see some changes) use:
 sudo systemctl restart local-dashboard
 ```
 
-Local server is responsible for monitoring VPS for request to turn on the comptuer. VPS updates one of it's files when user requests it. Local server fetches this file using `curl`, waiting for a specific command in this file. When curl command returns required phrase, the magic packet is sent and computer is powered on.
+Local server is responsible for monitoring VPS for request to turn on the comptuer. Local server polls ([local-command-polling.py](local-command-polling.py)) the VPS `wol_command_endpoint` every 20 seconds, waiting for a return code `WOL_START`. When curl command returns the required phrase, the magic packet is sent and computer is powered on.
 
-Additionally local server utilizes a simple dashboard with a button that allows to send magic packet, when we are logged to the home network. This simplifies the process that beforehand required using a terminal and remembering a MAC address.
+Additionally local server utilizes a simple dashboard ([index.py](local_server_dashboard/index.py)) with a button that allows to send magic packet, when we are logged to the home network. This simplifies the process that beforehand required using a terminal and remembering a MAC address.
 ---
 
 ## VPS (MIKRUS, 5 PLN TIER)
@@ -46,4 +56,8 @@ chmod +x vps-configuration.sh
 sudo ./vps-configuration.sh
 ```
 
-VPS is based on flask for a webpage and gunicore to activate it as a daemon.
+VPS is based on flask for a webpage and gunicore to activate it as a daemon. To remotely start your PC you should use `curl "http://frog02.mikr.us:YOUR_PORT/wol_request?token=YOUR_TOKEN"`. This shouuld return `Request Accepted`. If request was accpeted then `wol_command_endpoint` returns `WOL_START` (this is polled by your server on local network - RPi).
+
+### TODO:
+- add separate tokens for RPi and Caller (User)
+- add ssh configuration to bash files
