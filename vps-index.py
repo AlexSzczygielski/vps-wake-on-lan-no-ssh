@@ -29,11 +29,11 @@ if os.path.exists(env_file):
     with open(env_file) as f:
         for line in f:
             line = line.strip()
-            if line.startswith("TOKEN="):
+            if line.startswith("SERVER_TOKEN="):
                 TOKEN = line.split("=", 1)[1].strip()
 
 if not TOKEN:
-    raise Exception("TOKEN not found in .wol_env")
+    raise Exception("SERVER_TOKEN not found in .wol_env")
 
 @app.route('/')
 def hello_world():

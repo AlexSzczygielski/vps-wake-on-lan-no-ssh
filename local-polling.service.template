@@ -1,0 +1,13 @@
+[Unit]
+Description=Local Command Polling Agent for VPS-WOL
+After=network.target
+
+[Service]
+User={{USER}}
+Group=www-data
+WorkingDirectory={{WORKDIR}}
+ExecStart=/usr/bin/python3 {{WORKDIR}}/local-command-polling.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

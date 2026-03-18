@@ -1,0 +1,47 @@
+#!/bin/bash
+#cli_ui.sh
+#This file contains colours and simple print functions used in the shell scripts
+
+# Colors
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+BLUE="\033[0;34m"
+CYAN="\033[0;36m"
+MAGENTA="\033[0;35m"
+RESET="\033[0m"   # resets color
+
+print_logo() {
+    echo -e "${CYAN}▗▖  ▗▖ ▗▄▖      ▗▄▄▖ ▗▄▄▖▗▖ ▗▖    ▗▖ ▗▖ ▗▄▖ ▗▖ ▗▖▗▄▄▄▖     ▗▄▖ ▗▖  ▗▖    ▗▖    ▗▄▖ ▗▖  ▗▖
+▐▛▚▖▐▌▐▌ ▐▌    ▐▌   ▐▌   ▐▌ ▐▌    ▐▌ ▐▌▐▌ ▐▌▐▌▗▞▘▐▌       ▐▌ ▐▌▐▛▚▖▐▌    ▐▌   ▐▌ ▐▌▐▛▚▖▐▌
+▐▌ ▝▜▌▐▌ ▐▌     ▝▀▚▖ ▝▀▚▖▐▛▀▜▌    ▐▌ ▐▌▐▛▀▜▌▐▛▚▖ ▐▛▀▀▘    ▐▌ ▐▌▐▌ ▝▜▌    ▐▌   ▐▛▀▜▌▐▌ ▝▜▌
+▐▌  ▐▌▝▚▄▞▘    ▗▄▄▞▘▗▄▄▞▘▐▌ ▐▌    ▐▙█▟▌▐▌ ▐▌▐▌ ▐▌▐▙▄▄▖    ▝▚▄▞▘▐▌  ▐▌    ▐▙▄▄▖▐▌ ▐▌▐▌  ▐▌
+                                                                                         
+                                                                                         
+                                                                                          ${RESET}"
+}
+
+# https://patorjk.com/software/taag/#p=display&f=RubiFont&t=No+ssh+wake+on+lan&x=none&v=4&h=4&w=80&we=false
+# FONT - RubiFont
+
+print_logo_windows() {
+echo -e "${CYAN} ▗▄▄▖▗▄▄▄▖▗▄▖ ▗▄▄▖▗▄▄▄▖    ▗▖ ▗▖▗▄▄▄▖▗▖  ▗▖▗▄▄▄  ▗▄▖ ▗▖ ▗▖ ▗▄▄▖
+▐▌     █ ▐▌ ▐▌▐▌ ▐▌ █      ▐▌ ▐▌  █  ▐▛▚▖▐▌▐▌  █▐▌ ▐▌▐▌ ▐▌▐▌   
+ ▝▀▚▖  █ ▐▛▀▜▌▐▛▀▚▖ █      ▐▌ ▐▌  █  ▐▌ ▝▜▌▐▌  █▐▌ ▐▌▐▌ ▐▌ ▝▀▚▖
+▗▄▄▞▘  █ ▐▌ ▐▌▐▌ ▐▌ █      ▐▙█▟▌▗▄█▄▖▐▌  ▐▌▐▙▄▄▀▝▚▄▞▘▐▙█▟▌▗▄▄▞▘
+                                                               
+                                                               
+                                                               ${RESET}"
+}
+
+print_error() {
+    echo -e "${RED}$1${RESET}"
+}
+
+print_success() {
+    echo -e "${GREEN}$1${RESET}"
+}
+
+print_blue() {
+    echo -e "${CYAN}$1${RESET}"
+}

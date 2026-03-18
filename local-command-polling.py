@@ -19,10 +19,10 @@ if os.path.exists(env_file):
                 env_vars[key] = value
 
 MAC_ADDRESS = env_vars.get("MAC_ADDRESS")
-TOKEN = env_vars.get("TOKEN")
+TOKEN = env_vars.get("SERVER_TOKEN")
 
 if not MAC_ADDRESS or not TOKEN:
-    raise Exception("MAC_ADDRESS or TOKEN not found in .wol_env")
+    raise Exception("MAC_ADDRESS or SERVER_TOKEN not found in .wol_env")
 
 VPS_URL = f"https://frog02-20432.wykr.es/wol_request?token=$TOKEN?token={TOKEN}"
 
