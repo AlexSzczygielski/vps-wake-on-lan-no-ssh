@@ -24,7 +24,7 @@ TOKEN = env_vars.get("TOKEN")
 if not MAC_ADDRESS or not TOKEN:
     raise Exception("MAC_ADDRESS or TOKEN not found in .wol_env")
 
-VPS_URL = f"http://frog02.mikr.us:20432/wol_command?token={TOKEN}"
+VPS_URL = f"https://frog02-20432.wykr.es/wol_request?token=$TOKEN?token={TOKEN}"
 
 # get last timestamp from log
 def last_wol_time():

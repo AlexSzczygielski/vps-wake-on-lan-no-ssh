@@ -9,9 +9,11 @@ Turn on remote machine, using VPS and simple local server (e.g. RaspberryPi). Th
 ---
 
 ### How does this work?
-1. Sent request to VPS, authorized by token you set up. 
+0. **Always remember to use `HTTPS` communication, to prevent `TOKEN` leak.**
+
+1. Sent request to VPS ([start_windows.sh](user-machine/start_windows.sh)), authorized by token you set up. 
 ```bash
-curl "http://frog02.mikr.us:YOUR_PORT/wol_request?token=YOUR_TOKEN"
+curl "https://frog02-YOUR_PORT.wykr.es/wol_request?token=YOUR_TOKEN"
 Request Accepted
 ```
 2. Server on your local network polls the VPS endpoint. When endpoint returns the command, the magic packet is sent.
@@ -66,3 +68,7 @@ VPS is based on flask for a webpage and gunicore to activate it as a daemon. To 
 ### TODO:
 - add separate tokens for RPi and Caller (User)
 - add ssh configuration to bash files
+- Remove TOKEN from Query String (move to HTTP header)
+- add simple authentication on private server dashboard (prevents malicious local devices from access)
+- change vps flask from gunicorn to proper daemon service
+- add port configuration to [local-command-polling](local-command-polling.py)

@@ -26,7 +26,7 @@ echo -e "${CYAN} ▗▄▄▖▗▄▄▄▖▗▄▖ ▗▄▄▖▗▄▄▄�
 echo "Sending request with TOKEN: $TOKEN"
 
 # Get the response
-RESPONSE=$(curl -s "http://frog02.mikr.us:$PORT/wol_request?token=$TOKEN")
+RESPONSE=$(curl -s "https://frog02-$PORT.wykr.es/wol_request?token=$TOKEN")
 
 # Check response and print in color
 if [[ "$RESPONSE" == "Request accepted" ]]; then
