@@ -13,7 +13,7 @@ class WolState:
         if os.path.exists(cls.FLAG_FILE):
             with open(cls.FLAG_FILE, "r") as f:
                 last = float(f.read().strip())
-            if now - last < 20:  # 20 sec cooldown
+            if now - last < 10:  # 10 sec cooldown
                 return  # ignore rapid triggers (flooding)
         with open(cls.FLAG_FILE, "w") as f:
             f.write(str(now))

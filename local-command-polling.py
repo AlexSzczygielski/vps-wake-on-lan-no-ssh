@@ -3,8 +3,6 @@ import requests
 import subprocess
 import os
 from datetime import datetime
-import logging
-logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "local_server_dashboard/wol_log.txt")
@@ -48,15 +46,11 @@ def last_wol_time():
 while True:
     try:
         r = requests.get(VPS_URL, timeout=5)
-        logging.info(f"Requesting API {VPS_URL}")
-        logging.info(f"received code: {r.status_code}")
 
         if r.status_code == 200:
-            logging.info("Received status 200 OK")
             data = r.text.strip()
             
             if data:
-                logging.info("Received data")
                 # VPS returns Unix timestamp of last WOL request
                 vps_ts = float(data)
                 last_ts = last_wol_time()
@@ -67,7 +61,7 @@ while True:
                         subprocess.run(["wakeonlan", MAC_ADDRESS])
                     # log locally
                     with open(LOG_FILE, "a") as f:
-                        f.write(f"{datetime.now()} - WoL sent to {MAC_ADDRESS}\n")
+                        f.write(f"[REMOTE] {datetime.now()} - WoL sent to {MAC_ADDRESS}\n")
             
             """
             if data == "WOL_START":
