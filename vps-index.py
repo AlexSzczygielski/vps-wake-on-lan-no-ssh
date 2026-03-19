@@ -2,9 +2,12 @@
 from flask import Flask, request
 import os
 import time
+import datetime
 
 class WolState:
+    # Both files hold only single record, it is deleted after each access
     FLAG_FILE = "/tmp/wol.flag"
+    WOL_SENT_LOG = "/tmp/wol.sent"
 
     @classmethod
     def trigger(cls):
@@ -25,6 +28,22 @@ class WolState:
             with open(cls.FLAG_FILE, "r") as f:
                 time_stamp = f.read().strip()
             os.remove(cls.FLAG_FILE)
+            return time_stamp # Return timestamp of last request
+        return None # no WOL request
+
+    @classmethod
+    def save_wol_sent(cls,time_stamp):
+        """Saves timestamps of successful WOL"""
+        with open(cls.WOL_SENT_LOG, "w") as f:
+            f.write(str(time_stamp))
+
+    @classmethod
+    def return_and_delete_last_wol(cls):
+        """Checks if the last wol sent exists. Returns last wol sent timestamp."""
+        if os.path.exists(cls.WOL_SENT_LOG):
+            with open(cls.WOL_SENT_LOG, "r") as f:
+                time_stamp = f.read().strip()
+            os.remove(cls.WOL_SENT_LOG)
             return time_stamp # Return timestamp of last request
         return None # no WOL request
 
@@ -73,3 +92,29 @@ def wol_command_endpoint():
         return response
 
     return ""
+
+@app.route('/wol_ack', methods=['POST'])
+def wol_ack():
+    """Local server calls this to acknowledge WOL was sent"""
+    token = request.form.get("token")
+    ts = request.form.get("timestamp")  # optional: timestamp of WOL
+
+    if token != TOKEN:
+        return "Forbidden", 403
+
+    # Save it as a flag
+    WolState.save_wol_sent(ts)
+
+    return "ACK received", 200
+
+@app.route('/wol_status', methods=['GET'])
+def wol_status():
+    """Returns info about the last WOL sent (from /wol_ack)"""
+    token = request.args.get("token")
+    if token != TOKEN:
+        return "Forbidden", 403
+
+    response = WolState.return_and_delete_last_wol() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
+    if response:
+        return "WOL_SENT", 200
+    return {"status": "none", "message": "No WOL sent yet"}, 200

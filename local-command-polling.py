@@ -3,6 +3,8 @@ import requests
 import subprocess
 import os
 from datetime import datetime
+import logging
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "local_server_dashboard/wol_log.txt")
@@ -25,6 +27,7 @@ if not MAC_ADDRESS or not TOKEN:
     raise Exception("MAC_ADDRESS or SERVER_TOKEN not found in .wol_env")
 
 VPS_URL = f"https://frog02-20432.wykr.es/wol_command?token={TOKEN}"
+VPS_URL_ACK_RETURN = "https://frog02-20432.wykr.es/wol_ack" # here add token and timestamp, each time you use it!
 
 # get last timestamp from log
 def last_wol_time():
@@ -62,6 +65,19 @@ while True:
                     # log locally
                     with open(LOG_FILE, "a") as f:
                         f.write(f"[REMOTE] {datetime.now()} - WoL sent to {MAC_ADDRESS}\n")
+                    
+                    # Notify VPS
+                    try:
+                        ack_resp = requests.post(
+                            VPS_URL_ACK_RETURN,
+                            data={
+                                "token": TOKEN,
+                                "timestamp": datetime.now().timestamp()
+                            },
+                            timeout=5
+                        )
+                    except Exception as e:
+                        logging.error(f"Failed to send WOL ACK: {e}")
             
             """
             if data == "WOL_START":
@@ -75,7 +91,7 @@ while True:
             """
 
     except Exception as e:
-        print("Error contacting VPS:", e)
+        logging.error("Error contacting VPS:", e)
 
     import time
     time.sleep(20)  # poll every 20 sec
