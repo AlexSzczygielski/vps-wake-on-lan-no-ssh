@@ -54,8 +54,9 @@ while True:
         if r.status_code == 200:
             logging.info("Received status 200 OK")
             data = r.text.strip()
-            """
+            
             if data:
+                logging.info("Received data")
                 # VPS returns Unix timestamp of last WOL request
                 vps_ts = float(data)
                 last_ts = last_wol_time()
@@ -67,6 +68,7 @@ while True:
                     # log locally
                     with open(LOG_FILE, "a") as f:
                         f.write(f"{datetime.now()} - WoL sent to {MAC_ADDRESS}\n")
+            
             """
             if data == "WOL_START":
                 # send magic packet
@@ -76,6 +78,7 @@ while True:
                 # log locally
                 with open(LOG_FILE, "a") as f:
                     f.write(f"[REMOTE] {datetime.now()} - WoL sent to {MAC_ADDRESS}\n")
+            """
 
     except Exception as e:
         print("Error contacting VPS:", e)

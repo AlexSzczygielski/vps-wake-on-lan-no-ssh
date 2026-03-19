@@ -8,15 +8,25 @@ class WolState:
 
     @classmethod
     def trigger(cls):
+        """Saves new request flag with time stamp. It implements debouncing to prevent request flooding."""
+        now = time.time()
+        if os.path.exists(cls.FLAG_FILE):
+            with open(cls.FLAG_FILE, "r") as f:
+                last = float(f.read().strip())
+            if now - last < 20:  # 20 sec cooldown
+                return  # ignore rapid triggers (flooding)
         with open(cls.FLAG_FILE, "w") as f:
-            f.write(str(time.time()))
+            f.write(str(now))
 
     @classmethod
     def consume(cls):
+        """Checks if the request flag exists. Returns timestamp."""
         if os.path.exists(cls.FLAG_FILE):
+            with open(cls.FLAG_FILE, "r") as f:
+                time_stamp = f.read().strip()
             os.remove(cls.FLAG_FILE)
-            return True
-        return False
+            return time_stamp # Return timestamp of last request
+        return None # no WOL request
 
 app = Flask(__name__)
 
@@ -58,7 +68,8 @@ def wol_command_endpoint():
     if token != TOKEN:
         return "Forbidden", 403
 
-    if WolState.consume():
-        return "WOL_START"
+    response = WolState.consume() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
+    if response:
+        return response
 
     return ""
