@@ -3,6 +3,8 @@ import requests
 import subprocess
 import os
 from datetime import datetime
+import logging
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "local_server_dashboard/wol_log.txt")
@@ -24,7 +26,7 @@ TOKEN = env_vars.get("SERVER_TOKEN")
 if not MAC_ADDRESS or not TOKEN:
     raise Exception("MAC_ADDRESS or SERVER_TOKEN not found in .wol_env")
 
-VPS_URL = f"https://frog02-20432.wykr.es/wol_request?token=$TOKEN?token={TOKEN}"
+VPS_URL = f"https://frog02-20432.wykr.es/wol_command?token={TOKEN}"
 
 # get last timestamp from log
 def last_wol_time():
@@ -46,7 +48,11 @@ def last_wol_time():
 while True:
     try:
         r = requests.get(VPS_URL, timeout=5)
+        logging.info(f"Requesting API {VPS_URL}")
+        logging.info(f"received code: {r.status_code}")
+
         if r.status_code == 200:
+            logging.info("Received status 200 OK")
             data = r.text.strip()
             """
             if data:
