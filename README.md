@@ -1,6 +1,20 @@
 # VPS-WAKE-ON-LAN-NO-SSH
 
+<div align="center">
+
+[![Python](https://img.shields.io/badge/Backend-Python-blue?logo=python&logoColor=yellow)](https://www.python.org)   [![Flask](https://img.shields.io/badge/Web_Framework-Flask-red?logo=flask)](https://flask.palletsprojects.com/)  [![Raspberry Pi](https://img.shields.io/badge/Hardware-RaspberryPi-green?logo=raspberry-pi)](https://www.raspberrypi.org/)  
+[![Mikrus](https://img.shields.io/badge/VPS-Mikrus-green)](https://frog.mikr.us)
+</div>
+
 Turn on remote machine, using VPS and simple local server (e.g. RaspberryPi). This project does not require port forwarding or shell tunneling to VPS.
+
+---
+
+<div align="center">
+<img width = 80%  src= "https://frog02-30432.wykr.es/demo_assets/vps-wake-on-lan-no-ssh-demo.png">
+</div>
+
+---
 
 > Bash files are prepared for RPi 4B, so other machines might need a little adjustments.
 
