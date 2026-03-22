@@ -47,6 +47,22 @@ class WolState:
             return time_stamp # Return timestamp of last request
         return None # no WOL request
 
+    @classmethod
+    def peek_flag(cls):
+        """Checks if the request flag exists without consuming it."""
+        if os.path.exists(cls.FLAG_FILE):
+            with open(cls.FLAG_FILE, "r") as f:
+                return f.read().strip()
+        return None
+
+    @classmethod
+    def peek_wol_sent(cls):
+        """Checks the last WOL sent timestamp without consuming it."""
+        if os.path.exists(cls.WOL_SENT_LOG):
+            with open(cls.WOL_SENT_LOG, "r") as f:
+                return f.read().strip()
+        return None
+
 app = Flask(__name__)
 
 # Load TOKEN from .wol_env
@@ -65,8 +81,97 @@ if not TOKEN:
     raise Exception("SERVER_TOKEN not found in .wol_env")
 
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    wol_pending_ts = WolState.peek_flag()
+    last_wol_sent_ts = WolState.peek_wol_sent()
+
+    status = "Idle"
+    if wol_pending_ts:
+        try:
+            status_time = datetime.datetime.fromtimestamp(float(wol_pending_ts)).strftime('%Y-%m-%d %H:%M:%S UTC')
+            status = f"WOL request pending since {status_time}"
+        except (ValueError, TypeError):
+            status = "WOL request pending (invalid timestamp in flag file)"
+
+
+    last_wol_info = "No WOL packet has been confirmed sent yet."
+    if last_wol_sent_ts:
+        try:
+            sent_time = datetime.datetime.fromtimestamp(float(last_wol_sent_ts)).strftime('%Y-%m-%d %H:%M:%S UTC')
+            last_wol_info = f"Last WOL packet was confirmed sent at {sent_time}"
+        except (ValueError, TypeError):
+            last_wol_info = "Last WOL packet was confirmed, but timestamp is invalid."
+
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOL Service Status</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            color: #212529;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }}
+        .container {{
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }}
+        h1 {{
+            color: #0d6efd;
+            margin-bottom: 1.5rem;
+        }}
+        .status, .info {{
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+        }}
+        .status {{
+            background-color: #e9ecef;
+        }}
+        .info {{
+            background-color: #e9ecef;
+        }}
+        strong {{
+            color: #0d6efd;
+        }}
+        .footer {{
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WOL Service Status</h1>
+        <div class="status">
+            <strong>Current Status:</strong><br>{status}
+        </div>
+        <div class="info">
+            <strong>Last Confirmed WOL:</strong><br>{last_wol_info}
+        </div>
+        <div class="footer">
+            <p>This is a read-only status page. No actions can be triggered from here.</p>
+        </div>
+    </div>
+</body>
+</html>
+'''
+    return html
 
 @app.route('/wol_request')
 def wol_request():

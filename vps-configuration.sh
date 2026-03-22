@@ -31,4 +31,4 @@ read SERVER_TOKEN
 
 echo "start gunicorn - flask auto service"
 
-gunicorn -b 0.0.0.0:"$port" index:app &
+gunicorn -b 0.0.0.0:"$port" --chdir vps "app:create_app()" &
