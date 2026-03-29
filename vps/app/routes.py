@@ -89,9 +89,9 @@ def remote_machine_ack():
     return "ACK received", 200
 
 @main.route('/remote_machine_status', methods=['GET'])
-def remote_machine_ack():
+def remote_machine_status():
     """User calls this to check if the remote machine is up."""
-    token = request.form.get("token")
+    token = request.args.get("token")
 
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403

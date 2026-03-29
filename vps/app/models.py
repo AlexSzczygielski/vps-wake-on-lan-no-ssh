@@ -63,19 +63,28 @@ class WolState:
 
 class RemoteMachineStatus:
     LOG_FILE = "/tmp/remote_machine.log"
+    FLAG_FILE = "/tmp/remote_machine.flag"
 
     @classmethod
     def save_log(cls, timestamp):
         """Saves timestamp of successful remote machine on."""
-        with open(cls.LOG_FILE, "w") as f:
-            f.write(str(timestamp))
+        # Ensure timestamp is a float
+        ts_float = float(timestamp)
+
+        # Save raw timestamp
+        with open(cls.FLAG_FILE, "w") as f:
+            f.write(str(ts_float))
+
+        # Save human-readable flag
+        with open(cls.LOG_FILE, "a") as f:
+            f.write(f"REMOTE_ON: {time.ctime(ts_float)}\n")
     
     @classmethod
     def consume(cls):
         """Checks if the ON flag exists. Returns timestamp."""
-        if os.path.exists(cls.LOG_FILE):
-            with open(cls.LOG_FILE, "r") as f:
+        if os.path.exists(cls.FLAG_FILE):
+            with open(cls.FLAG_FILE, "r") as f:
                 time_stamp = f.read().strip()
-            os.remove(cls.LOG_FILE)
+            os.remove(cls.FLAG_FILE)
             return time_stamp # Return timestamp of last request
         return None # no WOL request

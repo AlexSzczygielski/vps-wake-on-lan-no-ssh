@@ -9,7 +9,8 @@ import datetime
 import logging
 logging.basicConfig(level=logging.INFO)
 
-VPS_URL_ACK_REMOTE_ON = ""
+PORT = ""
+VPS_URL_ACK_REMOTE_ON = f"https://frog02-{PORT}.wykr.es/remote_machine_ack"
 TOKEN = ""
 
 # Notify VPS
