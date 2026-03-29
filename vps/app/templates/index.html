@@ -1,20 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>WOL VPS Status</title>
-    <style>
-        body { font-family: sans-serif; background-color: #f4f4f4; color: #333; margin: 2em; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #0056b3; }
-        p { line-height: 1.6; }
-    </style>
+<meta charset="UTF-8">
+<title>WOL VPS Status</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9fafb;
+        color: #333;
+        margin: 2em;
+    }
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 25px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+        color: #1e3a8a;
+        margin-bottom: 15px;
+    }
+    p {
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+    h2 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        color: #1e40af;
+    }
+    .log-container {
+        background-color: #1e1e2f;
+        color: #f8f8f2;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.9rem;
+        padding: 15px;
+        border-radius: 10px;
+        max-height: 350px;
+        overflow-y: auto;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .log-line {
+        padding: 2px 0;
+    }
+    .log-line.request { color: #fbbf24; }   /* yellow/orange for REQUEST */
+    .log-line.success { color: #22c55e; }   /* green for SUCCESS */
+    .log-line.error { color: #ef4444; }     /* red for errors */
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>WOL Service Status</h1>
-        <p><strong>Current Status:</strong> {{ status }}</p>
-        <p><strong>Last Event:</strong> {{ last_wol_info }}</p>
+<div class="container">
+    <h1>WOL Service Status</h1>
+    <p><strong>Current Status:</strong> {{ status }}</p>
+    <p><strong>Last Event:</strong> {{ last_wol_info }}</p>
+
+    <h2>WOL Log (last 20 entries)</h2>
+    <div class="log-container" id="log-container">
+        {% for line in log_lines %}
+            {% set cls = '' %}
+            {% if 'REQUEST' in line %}
+                {% set cls = 'request' %}
+            {% elif 'Success' in line %}
+                {% set cls = 'success' %}
+            {% elif 'Failed' in line or 'error' in line %}
+                {% set cls = 'error' %}
+            {% endif %}
+            <div class="log-line {{ cls }}">{{ line.strip() }}</div>
+        {% endfor %}
     </div>
+</div>
+
+<script>
+// Auto-scroll to bottom (newest entries first)
+const logContainer = document.getElementById('log-container');
+logContainer.scrollTop = logContainer.scrollHeight;
+</script>
 </body>
 </html>

@@ -1,13 +1,14 @@
 from flask import Blueprint, request, current_app, render_template
 import datetime
 from .models import WolState, RemoteMachineStatus
+import os
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    wol_pending_ts = WolState.peek_flag()
-    last_wol_sent_ts = WolState.peek_wol_sent()
+    wol_pending_ts = WolState.peek_request_flag()
+    last_wol_sent_ts = WolState.peek_result_flag()
 
     status = "Idle"
     if wol_pending_ts:
@@ -25,7 +26,24 @@ def index():
         except (ValueError, TypeError):
             last_wol_info = "Last WOL packet was confirmed, but timestamp is invalid."
 
-    return render_template('index.html', status=status, last_wol_info=last_wol_info)
+    # Read last 20 lines of the WOL log and reverse them
+    log_lines = []
+    log_file = WolState.WOL_LOG
+    if os.path.exists(log_file):
+        try:
+            with open(log_file, "r") as f:
+                log_lines = f.readlines()[-20:]  # last 20 lines
+            log_lines.reverse()  # newest first
+        except Exception as e:
+            log_lines = [f"Failed to read log: {e}\n"]
+
+    return render_template(
+        'index.html',
+        status=status,
+        last_wol_info=last_wol_info,
+        log_lines=log_lines
+    )
+
 
 @main.route('/wol_request')
 def wol_request():
@@ -35,7 +53,7 @@ def wol_request():
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403
 
-    WolState.trigger()
+    WolState.trigger_request_flag()
     return "Request accepted", 202
 
 @main.route('/wol_command')
@@ -46,7 +64,7 @@ def wol_command_endpoint():
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403
 
-    response = WolState.consume()
+    response = WolState.consume_request_flag()
     if response:
         return response
 
@@ -61,7 +79,7 @@ def wol_ack():
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403
 
-    WolState.save_wol_sent(ts)
+    WolState.trigger_result_flag(ts)
     return "ACK received", 200
 
 @main.route('/wol_status', methods=['GET'])
@@ -71,7 +89,7 @@ def wol_status():
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403
 
-    response = WolState.return_and_delete_last_wol()
+    response = WolState.consume_result_flag()
     if response:
         return "WOL_SENT", 200
     return {"status": "none", "message": "No WOL sent yet"}, 200
@@ -96,7 +114,7 @@ def remote_machine_status():
     if token != current_app.config['TOKEN']:
         return "Forbidden", 403
 
-    response = RemoteMachineStatus.consume()
+    response = RemoteMachineStatus.consume_request_flag()
     if response:
         return "REMOTE_ON", 200
     return {"status": "none", "message": "REMOTE_DOWN"}, 200

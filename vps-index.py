@@ -10,7 +10,7 @@ class WolState:
     WOL_SENT_LOG = "/tmp/wol.sent"
 
     @classmethod
-    def trigger(cls):
+    def trigger_request_flag(cls):
         """Saves new request flag with time stamp. It implements debouncing to prevent request flooding."""
         now = time.time()
         if os.path.exists(cls.FLAG_FILE):
@@ -22,7 +22,7 @@ class WolState:
             f.write(str(now))
 
     @classmethod
-    def consume(cls):
+    def consume_request_flag(cls):
         """Checks if the request flag exists. Returns timestamp."""
         if os.path.exists(cls.FLAG_FILE):
             with open(cls.FLAG_FILE, "r") as f:
@@ -32,13 +32,13 @@ class WolState:
         return None # no WOL request
 
     @classmethod
-    def save_wol_sent(cls,time_stamp):
+    def trigger_result_flag(cls,time_stamp):
         """Saves timestamps of successful WOL"""
         with open(cls.WOL_SENT_LOG, "w") as f:
             f.write(str(time_stamp))
 
     @classmethod
-    def return_and_delete_last_wol(cls):
+    def consume_result_flag(cls):
         """Checks if the last wol sent exists. Returns last wol sent timestamp."""
         if os.path.exists(cls.WOL_SENT_LOG):
             with open(cls.WOL_SENT_LOG, "r") as f:
@@ -48,7 +48,7 @@ class WolState:
         return None # no WOL request
 
     @classmethod
-    def peek_flag(cls):
+    def peek_request_flag(cls):
         """Checks if the request flag exists without consuming it."""
         if os.path.exists(cls.FLAG_FILE):
             with open(cls.FLAG_FILE, "r") as f:
@@ -56,7 +56,7 @@ class WolState:
         return None
 
     @classmethod
-    def peek_wol_sent(cls):
+    def peek_result_flag(cls):
         """Checks the last WOL sent timestamp without consuming it."""
         if os.path.exists(cls.WOL_SENT_LOG):
             with open(cls.WOL_SENT_LOG, "r") as f:
@@ -82,8 +82,8 @@ if not TOKEN:
 
 @app.route('/')
 def index():
-    wol_pending_ts = WolState.peek_flag()
-    last_wol_sent_ts = WolState.peek_wol_sent()
+    wol_pending_ts = WolState.peek_request_flag()
+    last_wol_sent_ts = WolState.peek_result_flag()
 
     status = "Idle"
     if wol_pending_ts:
@@ -181,7 +181,7 @@ def wol_request():
     if token != TOKEN:
         return "Forbidden", 403
 
-    WolState.trigger()
+    WolState.trigger_request_flag()
     return "Request accepted", 202
 
 @app.route('/wol_command')
@@ -192,7 +192,7 @@ def wol_command_endpoint():
     if token != TOKEN:
         return "Forbidden", 403
 
-    response = WolState.consume() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
+    response = WolState.consume_request_flag() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
     if response:
         return response
 
@@ -208,7 +208,7 @@ def wol_ack():
         return "Forbidden", 403
 
     # Save it as a flag
-    WolState.save_wol_sent(ts)
+    WolState.trigger_result_flag(ts)
 
     return "ACK received", 200
 
@@ -219,7 +219,7 @@ def wol_status():
     if token != TOKEN:
         return "Forbidden", 403
 
-    response = WolState.return_and_delete_last_wol() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
+    response = WolState.consume_result_flag() # It has to be assigned to variable as this method clears the flag, so this method can be called only one time
     if response:
         return "WOL_SENT", 200
     return {"status": "none", "message": "No WOL sent yet"}, 200
