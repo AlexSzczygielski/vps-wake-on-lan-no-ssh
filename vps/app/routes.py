@@ -1,6 +1,6 @@
 from flask import Blueprint, request, current_app, render_template
 import datetime
-from .models import WolState
+from .models import WolState, RemoteMachineStatus
 
 main = Blueprint('main', __name__)
 
@@ -75,3 +75,28 @@ def wol_status():
     if response:
         return "WOL_SENT", 200
     return {"status": "none", "message": "No WOL sent yet"}, 200
+
+@main.route('/remote_machine_ack', methods=['POST'])
+def remote_machine_ack():
+    """Remote machine calls this to raise flag it is up and running."""
+    token = request.form.get("token")
+    ts = request.form.get("timestamp")
+
+    if token != current_app.config['TOKEN']:
+        return "Forbidden", 403
+
+    RemoteMachineStatus.save_log(ts)
+    return "ACK received", 200
+
+@main.route('/remote_machine_status', methods=['GET'])
+def remote_machine_ack():
+    """User calls this to check if the remote machine is up."""
+    token = request.form.get("token")
+
+    if token != current_app.config['TOKEN']:
+        return "Forbidden", 403
+
+    response = RemoteMachineStatus.consume()
+    if response:
+        return "REMOTE_ON", 200
+    return {"status": "none", "message": "REMOTE_DOWN"}, 200
