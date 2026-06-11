@@ -1,0 +1,49 @@
+flowchart TD
+
+    subgraph USER["USER SCRIPT"]
+        U1[Send /wol_request]
+        U2[Poll /wol_status]
+        U3[Poll /remote_machine_status]
+        U4[Launch AnyDesk]
+    end
+
+    subgraph VPS["VPS STATE"]
+        V1[Idle]
+        V2[WOL Requested<br> flag file ]
+        V3[WOL Sent Logged]
+        V4[Remote Machine ON Logged]
+    end
+
+    subgraph LOCAL_SERVER["LOCAL SERVER"]
+        L1[Poll /wol_command]
+        L2{Command Available?}
+        L3[Send WOL Packet]
+        L4[POST /wol_ack]
+    end
+
+    subgraph REMOTE_MACHINE["REMOTE MACHINE"]
+        R1[Booting]
+        R2[Run notify.py]
+        R3[POST /remote_machine_ack]
+    end
+
+    %% USER FLOW
+    U1 --> V2
+    U2 -->|Check| V3
+    U3 -->|Check| V4
+    V4 --> U4
+
+    %% VPS FLOW
+    V1 -->|Request received| V2
+    V2 -->|Consumed by local server| V2
+    V3 -->|Stored timestamp| V3
+    V4 -->|Stored timestamp| V4
+
+    %% LOCAL SERVER FLOW
+    L1 --> L2
+    V2 --> L1
+    L2 -- No --> L1
+    L2 -- Yes --> L3 --> L4 --> V3
+
+    %% REMOTE MACHINE FLOW
+    V3 --> R1 --> R2 --> R3 --> V4
